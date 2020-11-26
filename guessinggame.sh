@@ -3,33 +3,34 @@
 # Guessing Game Bash Script - The Unix Workbench
 
 # initializing counter
-file_size=0;
+File_counter=0;
 
 # Funtion to go through the whole directory and calculate the number of files
 function File_count {
-	for name in * .*
-	do
-    if [[ ! -d $name ]]
-    then
-        file_size=$(($file_size+1))
-    fi
-	done
+	shopt -s nullglob
+	File_counter=(*)
+	File_counter=${#File_counter[@]}
+    Directory_Counter=(*/)
+    Directory_Counter=${#Directory_Counter[@]}
+    (( File_counter -= Directory_Counter ))
 }
 
 # Functiom for the Guessing game to iterate till correct guess
 function Counting_Game {
   echo "Welcome to the Guesing Game"
-  echo "Your task is to guess the number of files in your directory"
   echo "Enter your guess for the number of files in this directory"
-  while [[ $response -ne file_size ]]
-	do
+  while [[ $int_num -ne File_counter  ]]; do
 	read response
-	echo "You entered : $response"
-
-	if [[ $response -eq file_size ]]
+	int_num=${response%\.*};
+	echo "Your guess to the nearest integer : $int_num"
+	# Input Sanitation for only intergers since file numbers cannot be non-integers
+	if ! [[ "$int_num" =~ ^[+-]?[0-9]+\.?[0-9]*$ ]]
+	then
+		echo "Please enter an integer to proceed "
+	elif [[ $int_num -eq File_counter ]]
 	then
 		echo "Congratualtions, you guessed correctly"
-	elif [[ $response -gt file_size ]]
+	elif [[ $int_num -gt File_counter ]]
 	then
 		echo "Your guess was too high, guess lower"
 	else
